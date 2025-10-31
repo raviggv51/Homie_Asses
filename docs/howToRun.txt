@@ -1,0 +1,32 @@
+🚀 Steps to Run the Project
+
+Follow these steps carefully to run the ETL pipeline successfully 👇
+
+1️⃣ Clone this repository
+git clone https://github.com/<your-github-username>/<repo-name>.git
+cd <repo-name>
+
+2️⃣ Start MySQL Database in Docker
+Run the following command to start the MySQL container using the provided Docker setup:
+docker-compose -f docker-compose.initial.yml up --build -d
+✅ This will:
+Build and start the MySQL container (mysql_ctn)
+Create a database named home_db
+Make it accessible for Python via SQLAlchemy
+
+3️⃣ Install all required Python modules
+Navigate to the Scripts folder and install dependencies:
+cd Scripts
+pip3 install -r requirements.txt
+
+4️⃣ Run the ETL Script
+Run the main ETL Python script:
+python3 test.py
+
+5️⃣ Verify the Data Load
+Connect to your MySQL container and verify the tables:
+docker exec -it mysql_ctn mysql -u db_user -p home_db
+
+SHOW TABLES;
+SELECT COUNT(*) FROM property;
+SELECT COUNT(*) FROM leads;

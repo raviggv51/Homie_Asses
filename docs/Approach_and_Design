@@ -1,0 +1,76 @@
+🧱 Approach and Design
+1️⃣ Understanding the Problem
+
+The provided JSON dataset contained property records with mixed and nested information —
+details about the property, its valuations, rehab costs, HOA data, and leads were all combined in one structure.
+This made the dataset denormalized and not relationally consistent.
+
+To make the data usable for analysis and storage, a proper ETL pipeline was designed.
+
+
+
+2️⃣ ETL Pipeline Overview
+
+The project follows a standard ETL (Extract → Transform → Load) architecture:
+
+Stage	Description
+Extract	Read the JSON array from fake_property_data_new.json using Python (pandas and json modules).
+Transform	Clean, normalize, and split the mixed JSON data into structured DataFrames — one for each business entity (property, leads, hoa, rehab, valuation, taxes).
+Load	Create relational MySQL tables using SQLAlchemy and load cleaned data into the database with proper foreign key constraints.
+
+
+
+3️⃣ Data Cleaning Strategy
+
+To ensure high-quality data:
+Created generic helper functions (clean_text, yes_no_normalize, extract_numeric) for common cleanup patterns.
+Replaced inconsistent values (e.g., "null", "NULL", " ") with NaN.
+Standardized Yes/No flags, capitalized names, and extracted numeric values from text fields like "5649 sqft".
+Filled missing categorical fields like Market with "Unknown".
+Removed duplicates and invalid records.
+
+
+
+4️⃣ Database Design (Normalization)
+
+The schema was designed using 3rd Normal Form (3NF) to eliminate redundancy:
+
+Table	Description	Relationship
+property	Core entity — stores unique details of each property	Primary table
+leads	Stores sales and review status per property	1 : N with property
+valuation	Contains property price and rent data	1 : N with property
+rehab	Stores property renovation details	1 : N with property
+hoa	Stores Homeowners Association info	1 : 1 with property
+taxes	Stores property tax information	1 : 1 with property
+
+Each child table references property_id as a foreign key.
+
+
+
+5️⃣ Technology Stack and Tools
+Component	Tool / Library	Purpose
+Language	Python 3	ETL and data transformation
+Libraries	pandas, numpy, re, sqlalchemy, pymysql	Data processing & DB connection
+Database	MySQL (via Docker)	Normalized relational storage
+Environment	Docker Compose	Reproducible local setup
+Documentation	Markdown, SQL, Python scripts	Clear reproducibility
+
+
+
+6️⃣ Data Loading and Validation
+
+Used SQLAlchemy ORM for safe insertion and schema creation.
+Added checks to ensure referential integrity:
+Dropped records referencing missing property_ids.
+Avoided duplicate primary key insertions.
+Verified successful data load with SQL queries and record counts.
+
+
+
+7️⃣ Design Decisions
+
+Chose MySQL for structured relational storage.
+Adopted Docker for easy environment setup and portability.
+Used Python Pandas for transformation due to its flexibility with nested JSON.
+Maintained clear modular design — separate cleaning logic per DataFrame for easier debugging.
+Stored helper functions centrally for reusability.
